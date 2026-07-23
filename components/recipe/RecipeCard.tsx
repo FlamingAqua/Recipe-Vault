@@ -13,6 +13,8 @@ import { Recipe } from "@/types/recipe";
 import FavoriteButton from "./FavoriteButton";
 import DeleteRecipeButton from "./DeleteRecipeButton";
 import ImageLightbox from "./ImageLightbox";
+import { useAuth } from "@/context/AuthContext";
+
 
 type Props = {
   recipe: Recipe;
@@ -41,6 +43,7 @@ function formatDate(createdAt: Timestamp | null) {
 export default function RecipeCard({ recipe }: Props) {
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  const { isAdmin } = useAuth();
   return (
     <>
       <motion.article
@@ -168,30 +171,39 @@ export default function RecipeCard({ recipe }: Props) {
           </dl>
 
           {/* Actions */}
-          <div className="mt-5 grid grid-cols-2 gap-2">
-            <Link
-              href={`/recipe/${recipe.id}`}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-card px-3 text-sm font-semibold transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              View Recipe
-            </Link>
+          {isAdmin ? (
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <Link
+                href={`/recipe/${recipe.id}`}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-card px-3 text-sm font-semibold transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                View Recipe
+              </Link>
 
-            <Link
-              href={`/edit/${recipe.id}`}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
+              <Link
+                href={`/edit/${recipe.id}`}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
 
-            <div className="col-span-2">
-              <DeleteRecipeButton
-                recipeId={recipe.id}
-                recipeName={recipe.name}
-              />
+              <div className="col-span-2">
+                <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="mt-5">
+              <Link
+                href={`/recipe/${recipe.id}`}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-border bg-card px-3 text-sm font-semibold transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                View Recipe
+              </Link>
+            </div>
+          )}
         </div>
       </motion.article>
 

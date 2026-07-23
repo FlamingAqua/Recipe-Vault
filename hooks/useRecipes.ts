@@ -1,19 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
 
-import { db } from "@/lib/firebase";
+import {
+  createRecipe,
+  editRecipe,
+  removeRecipe,
+  subscribeRecipes,
+} from "@/lib/firestore";
 import {
   Recipe,
   RecipeCategory,
@@ -25,51 +19,24 @@ export function useRecipes() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "recipes"),
-      orderBy("createdAt", "desc")
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setRecipes(
-        snapshot.docs.map(
-          (doc) =>
-            ({
-              id: doc.id,
-              ...doc.data(),
-            }) as Recipe
-        )
-      );
-
+    const unsubscribe = subscribeRecipes((recipes) => {
+      setRecipes(recipes);
       setLoading(false);
     });
 
     return unsubscribe;
   }, []);
 
-  async function addRecipe(
-    recipe: RecipeFormData
-  ) {
-    await addDoc(collection(db, "recipes"), {
-      ...recipe,
-      favorite: false,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+  async function addRecipe(recipe: RecipeFormData) {
+    await createRecipe(recipe);
   }
 
-  async function updateRecipe(
-    id: string,
-    recipe: RecipeFormData
-  ) {
-    await updateDoc(doc(db, "recipes", id), {
-      ...recipe,
-      updatedAt: serverTimestamp(),
-    });
+  async function updateRecipe(id: string, recipe: RecipeFormData) {
+    await editRecipe(id, recipe);
   }
 
   async function deleteRecipe(id: string) {
-    await deleteDoc(doc(db, "recipes", id));
+    await removeRecipe(id);
   }
 
   const favorites = useMemo(

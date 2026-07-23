@@ -5,14 +5,14 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   totalRecipes: number;
 };
 
-export default function DashboardHeader({
-  totalRecipes,
-}: Props) {
+export default function DashboardHeader({ totalRecipes }: Props) {
+  const { isAdmin } = useAuth();
   return (
     <motion.div
       initial={{
@@ -35,16 +35,14 @@ export default function DashboardHeader({
         </p>
       </div>
 
-      <Button
-        asChild
-        size="lg"
-        className="rounded-2xl"
-      >
-        <Link href="/create">
-          <Plus className="mr-2 h-5 w-5" />
-          Create Recipe
-        </Link>
-      </Button>
+      {isAdmin ? (
+        <Button asChild size="lg" className="rounded-2xl">
+          <Link href="/create">
+            <Plus className="mr-2 h-5 w-5" />
+            Create Recipe
+          </Link>
+        </Button>
+      ) : null}
     </motion.div>
   );
 }

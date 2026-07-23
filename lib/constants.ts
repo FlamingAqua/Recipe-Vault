@@ -1,3 +1,5 @@
+export const ADMIN_EMAIL = "rmanesh011@gmail.com";
+
 export const FIRESTORE_COLLECTIONS = {
   RECIPES: "recipes",
 };

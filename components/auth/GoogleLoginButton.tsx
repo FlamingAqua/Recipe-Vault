@@ -1,53 +1,29 @@
 "use client";
 
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { FcGoogle } from "react-icons/fc";
 
-import {
-  loginWithGoogle,
-} from "@/lib/auth";
+export default function GoogleLoginButton() {
+  const { signInWithGoogle } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-
-import {
-  Button,
-} from "@/components/ui/button";
-
-
-import {
-  FcGoogle,
-} from "react-icons/fc";
-
-
-export default function GoogleLoginButton(){
-
-async function handleLogin(){
-
-  try{
-
-    await loginWithGoogle();
-
-  }
-  catch(error){
-
-    console.error(error);
-
+  async function handleLogin() {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
-}
-
-
-return (
-
-<Button
-  onClick={handleLogin}
-  className="w-full rounded-xl"
->
-
-<FcGoogle className="mr-2 h-5 w-5"/>
-
-Continue with Google
-
-</Button>
-
-);
-
-
+  return (
+    <Button onClick={handleLogin} className="w-full rounded-xl" disabled={loading}>
+      <FcGoogle className="mr-2 h-5 w-5" />
+      {loading ? "Signing in..." : "Continue with Google"}
+    </Button>
+  );
 }

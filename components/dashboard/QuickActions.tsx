@@ -1,8 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Plus, BookOpen, Heart, Sparkles } from "lucide-react";
+
+import { useAuth } from "@/context/AuthContext";
 
 const actions = [
   {
@@ -11,6 +14,7 @@ const actions = [
     href: "/create",
     icon: Plus,
     color: "from-orange-500 to-amber-500",
+    adminOnly: true,
   },
   {
     title: "Browse Recipes",
@@ -36,41 +40,36 @@ const actions = [
 ];
 
 export default function QuickActions() {
+  const { isAdmin } = useAuth();
+
+  const visibleActions = useMemo(
+    () => actions.filter((action) => !action.adminOnly || isAdmin),
+    [isAdmin]
+  );
+
   return (
     <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-      {actions.map((action, index) => {
+      {visibleActions.map((action, index) => {
         const Icon = action.icon;
 
         return (
           <motion.div
             key={action.title}
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: index * 0.08,
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.08 }}
           >
             <Link
               href={action.href}
               className="group block overflow-hidden rounded-3xl border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div
-                className={`mb-5 inline-flex rounded-2xl bg-gradient-to-br ${action.color} p-4 text-white`}
-              >
+              <div className={`mb-5 inline-flex rounded-2xl bg-gradient-to-br ${action.color} p-4 text-white`}>
                 <Icon className="h-7 w-7" />
               </div>
 
               <h3 className="text-xl font-bold">{action.title}</h3>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                {action.description}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{action.description}</p>
             </Link>
           </motion.div>
         );

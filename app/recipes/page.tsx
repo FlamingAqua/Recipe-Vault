@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
+import AuthGuard from "@/components/auth/AuthGuard";
+import { useAuth } from "@/context/AuthContext";
 import { useRecipes } from "@/hooks/useRecipes";
 import SearchBar from "@/components/dashboard/SearchBar";
 import Footer from "@/components/common/Footer";
@@ -21,6 +23,7 @@ const categoryLabels: Category[] = [
 
 export default function RecipesPage() {
   const { recipes = [], loading } = useRecipes();
+  const { isAdmin } = useAuth();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category>("All");
 
@@ -51,8 +54,18 @@ export default function RecipesPage() {
     return data;
   }, [recipes, search, category]);
 
+  const emptyStateProps = isAdmin
+    ? {
+        buttonText: "Create a recipe",
+        buttonHref: "/create",
+      }
+    : {
+        buttonText: "Back to dashboard",
+        buttonHref: "/",
+      };
+
   return (
-    <>
+    <AuthGuard>
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -116,8 +129,8 @@ export default function RecipesPage() {
               <EmptyState
                 title="No recipes found"
                 description="Try a different search term or choose another category."
-                buttonText="Create a recipe"
-                buttonHref="/create"
+                buttonText={emptyStateProps.buttonText}
+                buttonHref={emptyStateProps.buttonHref}
               />
             ) : (
               <RecipeGrid recipes={filteredRecipes} />
@@ -127,6 +140,6 @@ export default function RecipesPage() {
       </main>
 
       <Footer />
-    </>
+    </AuthGuard>
   );
 }
