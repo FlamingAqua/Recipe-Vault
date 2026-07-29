@@ -9,6 +9,7 @@ import {
   subscribeRecipes,
 } from "@/lib/firestore";
 import {
+  normalizeRecipeIngredients,
   Recipe,
   RecipeCategory,
   RecipeFormData,
@@ -52,13 +53,15 @@ export function useRecipes() {
     category: RecipeCategory | "All"
   ) {
     return recipes.filter((recipe) => {
+      const ingredientText = normalizeRecipeIngredients(recipe.ingredients)
+        .map((ingredient) => `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`)
+        .join(" ");
+
       const matchesSearch =
         recipe.name
           .toLowerCase()
           .includes(search.toLowerCase()) ||
-        recipe.ingredients
-          .toLowerCase()
-          .includes(search.toLowerCase());
+        ingredientText.toLowerCase().includes(search.toLowerCase());
 
       const matchesCategory =
         category === "All" ||

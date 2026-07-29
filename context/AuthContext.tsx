@@ -10,7 +10,7 @@ import { ADMIN_EMAIL } from "@/lib/constants";
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<User>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
 };
@@ -18,7 +18,9 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signInWithGoogle: async () => {},
+  signInWithGoogle: async () => {
+    throw new Error("Auth provider not initialized");
+  },
   signOut: async () => {},
   isAdmin: false,
 });

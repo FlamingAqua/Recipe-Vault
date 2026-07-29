@@ -13,7 +13,7 @@ export default function EditRecipeClient({ recipeId }: Props) {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12" role="status">
+      <main className="mx-auto max-w-[920px] px-4 py-8 sm:px-6 sm:py-12" role="status">
         Loading recipe...
       </main>
     );
@@ -23,14 +23,14 @@ export default function EditRecipeClient({ recipeId }: Props) {
 
   if (!recipe) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+      <main className="mx-auto max-w-[920px] px-4 py-8 sm:px-6 sm:py-12">
         Recipe not found.
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="mx-auto max-w-[920px] px-4 py-8 sm:px-6 sm:py-12">
       <BackButton />
 
       <div className="mb-8 max-w-2xl">
@@ -52,7 +52,7 @@ export default function EditRecipeClient({ recipeId }: Props) {
           name: recipe.name,
           category: recipe.category,
           ingredients: recipe.ingredients,
-          method: recipe.method,
+          instructions: recipe.instructions,
           warnings: recipe.warnings,
           tips: recipe.tips,
           notes: recipe.notes ?? "",

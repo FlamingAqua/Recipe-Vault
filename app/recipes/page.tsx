@@ -12,6 +12,7 @@ import RecipeGrid from "@/components/recipe/RecipeGrid";
 import BackButton from "@/components/common/BackButton";
 import { Category } from "@/components/dashboard/CategoryFilter";
 import EmptyState from "@/components/common/EmptyState";
+import { normalizeRecipeIngredients } from "@/types/recipe";
 
 const categoryLabels: Category[] = [
   "All",
@@ -32,13 +33,17 @@ export default function RecipesPage() {
 
     if (search.trim()) {
       const query = search.toLowerCase().trim();
-      data = data.filter((recipe) =>
-        [recipe.name, recipe.ingredients, recipe.category, ...(recipe.tags ?? [])]
+      data = data.filter((recipe) => {
+        const ingredientText = normalizeRecipeIngredients(recipe.ingredients)
+          .map((ingredient) => `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`)
+          .join(" ");
+
+        return [recipe.name, ingredientText, recipe.category, ...(recipe.tags ?? [])]
           .filter(Boolean)
           .join(" ")
           .toLowerCase()
-          .includes(query)
-      );
+          .includes(query);
+      });
     }
 
     if (category !== "All") {

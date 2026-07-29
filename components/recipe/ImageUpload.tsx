@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
@@ -12,18 +13,11 @@ type Props = {
   onChange: (url: string) => void;
 };
 
-export default function ImageUpload({
-  value,
-  onChange,
-}: Props) {
+export default function ImageUpload({ value, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const [uploading, setUploading] =
-    useState(false);
-
-  async function handleUpload(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
     if (!file) return;
@@ -32,7 +26,6 @@ export default function ImageUpload({
 
     try {
       const url = await uploadRecipeImage(file);
-
       onChange(url);
     } finally {
       setUploading(false);
@@ -41,51 +34,51 @@ export default function ImageUpload({
 
   return (
     <div className="space-y-4">
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={handleUpload}
-      />
+      <input ref={inputRef} type="file" accept="image/*" hidden onChange={handleUpload} />
 
-      {value ? (
-        <div className="relative h-72 overflow-hidden rounded-3xl border">
-          <Image
-            src={value}
-            alt="Recipe"
-            fill
-            className="object-cover"
-            unoptimized
-          />
-
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            className="absolute right-4 top-4"
-            onClick={() => onChange("")}
+      <AnimatePresence mode="wait">
+        {value ? (
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="relative h-72 overflow-hidden rounded-[1.75rem] border border-border/70 bg-muted/60"
           >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ) : (
-        <button
-          type="button"
-          disabled={uploading}
-          onClick={() => inputRef.current?.click()}
-          className="flex h-72 w-full flex-col items-center justify-center rounded-3xl border border-border bg-card px-8 text-center transition hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/5"
-        >
-          <ImagePlus className="mb-4 h-12 w-12 text-primary" />
+            <Image src={value} alt="Recipe" fill className="object-cover" unoptimized />
 
-          <p className="text-sm font-semibold text-foreground">
-            {uploading ? "Uploading..." : "Upload recipe cover image"}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            JPG, PNG or GIF — max 5MB.
-          </p>
-        </button>
-      )}
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute right-4 top-4"
+              onClick={() => onChange("")}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.button
+            key="upload"
+            type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+            className="flex h-72 w-full flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-border bg-card/70 px-8 text-center transition hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/5"
+          >
+            <ImagePlus className="mb-4 h-12 w-12 text-primary" />
+
+            <p className="text-sm font-semibold text-foreground">
+              {uploading ? "Uploading..." : "Upload recipe cover image"}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">JPG, PNG or GIF — max 5MB.</p>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
